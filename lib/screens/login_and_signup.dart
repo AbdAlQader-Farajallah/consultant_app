@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../api/controllers/auth_api_controller.dart';
 import 'home_screen.dart';
 
 class LoginAndSignupPage extends StatefulWidget {
@@ -17,16 +18,24 @@ class _LoginAndSignupPageState extends State<LoginAndSignupPage>
   late PageController _pageController;
   bool isVisible = false;
   late TabController tabController;
+  late TextEditingController _emailTextController;
+  late TextEditingController _passwordTextController;
+  late TextEditingController _nameTextController;
 
   @override
   void initState() {
     super.initState();
+    _emailTextController = TextEditingController();
+    _passwordTextController = TextEditingController();
+    _nameTextController = TextEditingController();
     _pageController = PageController();
     tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
+    _emailTextController.dispose();
+    _passwordTextController.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -121,17 +130,23 @@ class _LoginAndSignupPageState extends State<LoginAndSignupPage>
                             ],
                           ),
                           const SizedBox(
-                            height: 32,
+                            height: 32
                           ),
                           Expanded(
                             child: TabBarView(
                               controller: tabController,
                               children: [
+                                //
+                                //
+                                // Login
+                                //
+                                //
                                 ListView(
                                   children: [
-                                    const TextField(
+                                    TextField(
+                                      controller: _emailTextController,
                                       keyboardType: TextInputType.emailAddress,
-                                      decoration: InputDecoration(
+                                      decoration: const InputDecoration(
                                         prefixIcon: Icon(Icons.email),
                                         prefixIconColor: Color(0xFF6589FF),
                                         border: UnderlineInputBorder(),
@@ -140,39 +155,40 @@ class _LoginAndSignupPageState extends State<LoginAndSignupPage>
                                     ),
                                     const SizedBox(height: 10),
                                     TextFormField(
+                                      controller: _passwordTextController,
                                       keyboardType:
                                           TextInputType.visiblePassword,
                                       obscureText: !isVisible,
                                       decoration: InputDecoration(
-                                        prefixIcon: Icon(Icons.lock),
-                                        prefixIconColor: Color(0xFF6589FF),
-                                        border: UnderlineInputBorder(),
+                                        prefixIcon: const Icon(Icons.lock),
+                                        prefixIconColor:
+                                            const Color(0xFF6589FF),
+                                        border: const UnderlineInputBorder(),
                                         hintText: "Write password",
-                                          suffixIcon: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                print(isVisible);
-                                                isVisible = !isVisible;
-                                                print(isVisible);
-                                              });
-                                            },
-                                            icon: isVisible
-                                                ? Icon(
-                                              Icons.visibility,
-                                              color: Colors.grey,
-                                            )
-                                                : Icon(
-                                              Icons.visibility_off,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
+                                        suffixIcon: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              print(isVisible);
+                                              isVisible = !isVisible;
+                                              print(isVisible);
+                                            });
+                                          },
+                                          icon: isVisible
+                                              ? const Icon(
+                                                  Icons.visibility,
+                                                  color: Colors.grey,
+                                                )
+                                              : const Icon(
+                                                  Icons.visibility_off,
+                                                  color: Colors.grey,
+                                                ),
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(height: 48),
                                     GestureDetector(
-                                      onTap: () {
-                                        Navigator.pushReplacementNamed(
-                                            context, HomePage.id);
+                                      onTap: () async {
+                                        await performLogin();
                                       },
                                       child: Container(
                                         height: 50.0,
@@ -201,11 +217,17 @@ class _LoginAndSignupPageState extends State<LoginAndSignupPage>
                                     ),
                                   ],
                                 ),
+                                //
+                                //
+                                // Register
+                                //
+                                //
                                 ListView(
                                   children: [
-                                    const TextField(
+                                     TextField(
+                                       controller: _nameTextController,
                                       keyboardType: TextInputType.name,
-                                      decoration: InputDecoration(
+                                      decoration: const InputDecoration(
                                         prefixIcon: Icon(Icons.person),
                                         prefixIconColor: Color(0xFF6589FF),
                                         border: UnderlineInputBorder(),
@@ -213,9 +235,10 @@ class _LoginAndSignupPageState extends State<LoginAndSignupPage>
                                       ),
                                     ),
                                     const SizedBox(height: 10),
-                                    const TextField(
+                                    TextField(
+                                      controller: _emailTextController,
                                       keyboardType: TextInputType.emailAddress,
-                                      decoration: InputDecoration(
+                                      decoration: const InputDecoration(
                                         prefixIcon: Icon(Icons.email),
                                         prefixIconColor: Color(0xFF6589FF),
                                         border: UnderlineInputBorder(),
@@ -224,38 +247,38 @@ class _LoginAndSignupPageState extends State<LoginAndSignupPage>
                                     ),
                                     const SizedBox(height: 10),
                                     TextFormField(
+                                      controller: _passwordTextController,
                                       keyboardType:
                                           TextInputType.visiblePassword,
                                       obscureText: !isVisible,
                                       decoration: InputDecoration(
-                                        prefixIcon: Icon(Icons.lock),
-                                        prefixIconColor: Color(0xFF6589FF),
-                                          border: UnderlineInputBorder(),
-                                          hintText: "Write password",
-                                          suffixIcon: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                isVisible = !isVisible;
-                                              });
-                                            },
-                                            icon: isVisible
-                                                ? Icon(
-                                                    Icons.visibility,
-                                                    color: Colors.grey,
-                                                  )
-                                                : Icon(
-                                                    Icons.visibility_off,
-                                                    color: Colors.grey,
-                                                  ),
-                                          ),
+                                        prefixIcon:const Icon(Icons.lock),
+                                        prefixIconColor: const Color(0xFF6589FF),
+                                        border:const UnderlineInputBorder(),
+                                        hintText: "Write password",
+                                        suffixIcon: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              isVisible = !isVisible;
+                                            });
+                                          },
+                                          icon: isVisible
+                                              ? const Icon(
+                                                  Icons.visibility,
+                                                  color: Colors.grey,
+                                                )
+                                              : const Icon(
+                                                  Icons.visibility_off,
+                                                  color: Colors.grey,
+                                                ),
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(height: 10),
                                     const SizedBox(height: 40),
                                     GestureDetector(
-                                      onTap: () {
-                                        Navigator.pushReplacementNamed(
-                                            context, HomePage.id);
+                                      onTap: ()  {
+
                                       },
                                       child: Container(
                                         height: 50.0,
@@ -428,4 +451,57 @@ class _LoginAndSignupPageState extends State<LoginAndSignupPage>
       ),
     );
   }
+
+  Future<void> performLogin() async {
+    if (checkData()) {
+      await login();
+    }
+  }
+
+  bool checkData() {
+    if (_emailTextController.text.isNotEmpty &&
+        _passwordTextController.text.isNotEmpty) {
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> login() async {
+    bool status = await AuthApiController().login(
+      context,
+      email: _emailTextController.text,
+      password: _passwordTextController.text,
+    );
+    if (status) Navigator.pushReplacementNamed(context, HomePage.id);
+  }
+
+
+  //****************************************************************************
+  Future<void> performRegister() async {
+    if (checkDataRegister()) {
+      await Register();
+    }
+  }
+
+  bool checkDataRegister() {
+    if (_emailTextController.text.isNotEmpty &&
+        _passwordTextController.text.isNotEmpty) {
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> Register() async {
+    bool status = await AuthApiController().register(
+      context,
+      name: _nameTextController.text,
+      email: _emailTextController.text,
+      password: _passwordTextController.text,
+    );
+    if (status) Navigator.pushReplacementNamed(context, HomePage.id);
+  }
+
+
+
+
 }
